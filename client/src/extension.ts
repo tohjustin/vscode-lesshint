@@ -12,6 +12,10 @@ import {
   TransportKind,
 } from "vscode-languageclient";
 
+const EXTENSION_CONFIG_FILENAME = ".lesshintrc";
+const EXTENSION_LANGUAGE = "less";
+const EXTENSION_NAME = "lesshint";
+
 let client: LanguageClient;
 
 export function activate(context: ExtensionContext) {
@@ -37,16 +41,16 @@ export function activate(context: ExtensionContext) {
   // Options to control the language client
   const clientOptions: LanguageClientOptions = {
     // Register the server for plain text documents
-    documentSelector: [{ scheme: "file", language: "less" }],
+    documentSelector: [{ scheme: "file", language: EXTENSION_LANGUAGE }],
     synchronize: {
-      // Notify the server about file changes to '.clientrc files contained in the workspace
-      fileEvents: workspace.createFileSystemWatcher("**/.clientrc"),
+      configurationSection: EXTENSION_NAME,
+      fileEvents: workspace.createFileSystemWatcher(`**/${EXTENSION_CONFIG_FILENAME}`),
     },
   };
 
   // Create the language client and start the client.
   client = new LanguageClient(
-    "lesshint",
+    EXTENSION_NAME,
     serverOptions,
     clientOptions,
   );

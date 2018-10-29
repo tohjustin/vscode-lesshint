@@ -1,15 +1,23 @@
 "use strict";
 
 import {
+  Diagnostic as LesshintDiagnostic,
+  Lesshint,
+} from "lesshint";
+import {
   createConnection,
   Diagnostic,
-  DiagnosticSeverity,
   DidChangeConfigurationNotification,
+  Files,
   InitializeParams,
   ProposedFeatures,
   TextDocument,
   TextDocuments,
 } from "vscode-languageserver";
+
+import {
+  convertDiagnostics,
+} from "./validate";
 
 const connection = createConnection(ProposedFeatures.all);
 const documents = new TextDocuments();
@@ -25,26 +33,20 @@ let globalSettings: IExtensionSettings = defaultSettings;
 const documentSettings: Map<string, Thenable<IExtensionSettings>> = new Map();
 
 async function validateTextDocument(textDocument: TextDocument): Promise<void> {
-  // The validator creates diagnostics for all uppercase words length 2 and more
-  const text = textDocument.getText();
-  const pattern = /\b[A-Z]{2,}\b/g;
-  let m: RegExpExecArray;
-
-  let problems = 0;
   const diagnostics: Diagnostic[] = [];
-  while ((m = pattern.exec(text)) && problems < 1000) { // tslint:disable-line no-conditional-assignment
-    problems++;
-    const diagnosic: Diagnostic = {
-      message: `${m[0]} is all uppercase.`,
-      range: {
-        end: textDocument.positionAt(m.index + m[0].length),
-        start: textDocument.positionAt(m.index),
-      },
-      severity: DiagnosticSeverity.Warning,
-      source: "ex",
-    };
 
-    diagnostics.push(diagnosic);
+  // In this simple example we get the settings for every validate run.
+  const documentPath = Files.uriToFilePath(textDocument.uri);
+  const text = textDocument.getText();
+
+  try {
+    const lesshint = new Lesshint();
+    lesshint.configure({});
+    const result: LesshintDiagnostic[] = lesshint.checkString(text, documentPath);
+    diagnostics.push(...convertDiagnostics(result));
+  } catch (err) {
+    connection.window.showErrorMessage("lesshint couldn't check this file.");
+    connection.window.showErrorMessage(err.stack.replace(/\n/ug, " "));
   }
 
   // Send the computed diagnostics to VSCode.

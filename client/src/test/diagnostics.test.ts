@@ -5,27 +5,27 @@ import * as vscode from "vscode";
 import { activate, getDocUri } from "./helper";
 
 describe("Should get diagnostics", () => {
-  const docUri = getDocUri("diagnostics.txt");
+  const docUri = getDocUri("diagnostics.less");
 
-  it("Diagnoses uppercase texts", async () => {
+  it("Diagnoses less files", async () => {
     await testDiagnostics(docUri, [
       {
-        message: "ANY is all uppercase.",
-        range: toRange(0, 0, 0, 3),
+        message: "Hexadecimal color \"#33333\" should be either three or six characters long.",
+        range: toRange(0, 12, 1, 0),
         severity: vscode.DiagnosticSeverity.Warning,
-        source: "ex",
+        source: "lesshint",
       },
       {
-        message: "ANY is all uppercase.",
-        range: toRange(0, 14, 0, 17),
+        message: "Unit \"zz\" is not allowed for \"font-size\".",
+        range: toRange(4, 13, 5, 0),
         severity: vscode.DiagnosticSeverity.Warning,
-        source: "ex",
+        source: "lesshint",
       },
       {
-        message: "OS is all uppercase.",
-        range: toRange(0, 18, 0, 20),
+        message: "\"font-weight\" should be before \"justify-content\"",
+        range: toRange(6, 2, 7, 0),
         severity: vscode.DiagnosticSeverity.Warning,
-        source: "ex",
+        source: "lesshint",
       },
     ]);
   });

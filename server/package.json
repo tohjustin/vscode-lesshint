@@ -11,6 +11,7 @@
 		"url": "https://github.com/tohjustin/vscode-lesshint"
 	},
 	"dependencies": {
+		"lesshint": "^5.2.1",
 		"vscode-languageserver": "^4.1.3"
 	},
 	"scripts": {}
