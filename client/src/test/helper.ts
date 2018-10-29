@@ -1,7 +1,3 @@
-/* --------------------------------------------------------------------------------------------
- * Copyright (c) Microsoft Corporation. All rights reserved.
- * Licensed under the MIT License. See License.txt in the project root for license information.
- * ------------------------------------------------------------------------------------------ */
 'use strict';
 
 import * as vscode from 'vscode';
@@ -13,11 +9,11 @@ export let documentEol: string;
 export let platformEol: string;
 
 /**
- * Activates the vscode.lsp-sample extension
+ * Activates the vscode-lesshint extension
  */
 export async function activate(docUri: vscode.Uri) {
 	// The extensionId is `publisher.name` from package.json
-	const ext = vscode.extensions.getExtension('vscode.lsp-sample');
+	const ext = vscode.extensions.getExtension('tohjustin.vscode-lesshint');
 	await ext.activate();
 	try {
 		doc = await vscode.workspace.openTextDocument(docUri);

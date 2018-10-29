@@ -1,12 +1,10 @@
-/* --------------------------------------------------------------------------------------------
- * Copyright (c) Microsoft Corporation. All rights reserved.
- * Licensed under the MIT License. See License.txt in the project root for license information.
- * ------------------------------------------------------------------------------------------ */
 'use strict';
 
 import * as path from 'path';
-import { workspace, ExtensionContext } from 'vscode';
-
+import {
+	workspace,
+	ExtensionContext
+} from 'vscode';
 import {
 	LanguageClient,
 	LanguageClientOptions,
@@ -48,8 +46,7 @@ export function activate(context: ExtensionContext) {
 
 	// Create the language client and start the client.
 	client = new LanguageClient(
-		'languageServerExample',
-		'Language Server Example',
+		'lesshint',
 		serverOptions,
 		clientOptions
 	);
