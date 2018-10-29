@@ -46,11 +46,15 @@
 		"watch:server": "tsc -w -p ./server/tsconfig.json",
 		"compile": "npm run compile:client && npm run compile:server",
 		"postinstall": "cd client && npm install && cd ../server && npm install && cd ..",
-		"test": "sh ./scripts/e2e.sh"
+		"test": "sh ./scripts/e2e.sh",
+		"tslint:client": "tslint --config tslint.json -p ./client/tsconfig.json",
+		"tslint:server": "tslint --config tslint.json -p ./server/tsconfig.json",
+		"tslint": "npm run tslint:client && npm run tslint:server"
 	},
 	"devDependencies": {
 		"@types/mocha": "^5.2.0",
 		"@types/node": "^8.0.0",
+		"tslint": "^5.11.0",
 		"typescript": "2.8.3"
 	}
 }
