@@ -1,5 +1,7 @@
 "use strict";
 
+import * as path from "path";
+
 import {
   Diagnostic as LesshintDiagnostic,
   Lesshint,
@@ -27,10 +29,8 @@ let hasConfigurationCapability: boolean = false;
 let hasWorkspaceFolderCapability: boolean = false;
 
 // Settings
-interface IExtensionSettings {} // tslint:disable-line no-empty-interface
-const defaultSettings: IExtensionSettings = {};
-let globalSettings: IExtensionSettings = defaultSettings;
-const documentSettings: Map<string, Thenable<IExtensionSettings>> = new Map();
+let lesshintConfig: any;
+let clientSettings: any;
 
 async function validateTextDocument(textDocument: TextDocument): Promise<void> {
   const diagnostics: Diagnostic[] = [];
@@ -41,7 +41,18 @@ async function validateTextDocument(textDocument: TextDocument): Promise<void> {
 
   try {
     const lesshint = new Lesshint();
-    lesshint.configure({});
+
+    // Load lesshint config if not loaded yet
+    if (!lesshintConfig) {
+      const pathDir = clientSettings.globalConfig ?
+        clientSettings.globalConfigDir :
+        path.dirname(documentPath);
+
+      lesshintConfig = lesshint.getConfig(pathDir);
+      connection.console.log(`lesshint Config updated: ${JSON.stringify(lesshintConfig)}`);
+    }
+
+    lesshint.configure(lesshintConfig);
     const result: LesshintDiagnostic[] = lesshint.checkString(text, documentPath);
     diagnostics.push(...convertDiagnostics(result));
   } catch (err) {
@@ -86,30 +97,26 @@ connection.onInitialized(() => {
 });
 
 connection.onDidChangeConfiguration((change) => {
-  if (hasConfigurationCapability) {
-    // Reset all cached document settings
-    documentSettings.clear();
-  } else {
-    globalSettings = (
-      (change.settings.lesshint || defaultSettings)
-    ) as IExtensionSettings;
-  }
+  connection.console.log(`We received an configuration change event: ${JSON.stringify(change)}`);
+  clientSettings = change.settings.lesshint;
 
-  connection.console.log(`Global Settings: ${JSON.stringify(globalSettings)}`);
+  // Clear config so it will be reloaded in `validateTextDocument`
+  lesshintConfig = undefined;
+
   documents.all().forEach(validateTextDocument);
 });
 
 connection.onDidChangeWatchedFiles((change) => {
   connection.console.log(`We received an file change event: ${JSON.stringify(change)}`);
+
+  // Clear config so it will be reloaded in `validateTextDocument`
+  lesshintConfig = undefined;
+
   documents.all().forEach(validateTextDocument);
 });
 
 documents.onDidChangeContent(({ document }) => {
   validateTextDocument(document);
-});
-
-documents.onDidClose((e) => {
-  documentSettings.delete(e.document.uri);
 });
 
 documents.listen(connection);

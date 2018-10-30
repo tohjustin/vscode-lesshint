@@ -24,6 +24,15 @@
 			"type": "object",
 			"title": "lesshint configuration options",
 			"properties": {
+				"lesshint.globalConfig": {
+					"type": "boolean",
+					"default": false,
+					"description": "Use a global configuration file."
+				},
+				"lesshint.globalConfigDir": {
+					"type": "string",
+					"description": "Path to directory of global configuration file."
+				},
 				"lesshint.trace.server": {
 					"scope": "window",
 					"type": "string",
